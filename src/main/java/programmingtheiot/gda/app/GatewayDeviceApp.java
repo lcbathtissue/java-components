@@ -11,6 +11,8 @@
 
 package programmingtheiot.gda.app;
 
+import programmingtheiot.gda.system.SystemPerformanceManager;
+
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -26,10 +28,8 @@ public class GatewayDeviceApp
 		Logger.getLogger(GatewayDeviceApp.class.getName());
 	
 	public static final long DEFAULT_TEST_RUNTIME = 60000L;
-	
-	// private var's
-	
-	
+	private final SystemPerformanceManager sysPerfManager;
+
 	// constructors
 	
 	/**
@@ -40,7 +40,9 @@ public class GatewayDeviceApp
 	public GatewayDeviceApp(String[] args)
 	{
 		super();
-		
+
+		// private var's
+		this.sysPerfManager = new SystemPerformanceManager();
 		_Logger.info("Initializing GDA...");
 		
 		parseArgs(args);
@@ -84,6 +86,7 @@ public class GatewayDeviceApp
 			// TODO: Your code here
 			
 			_Logger.info("GDA started successfully.");
+			sysPerfManager.startManager();
 		} catch (Exception e) {
 			_Logger.log(Level.SEVERE, "Failed to start GDA. Exiting.", e);
 			
@@ -99,6 +102,7 @@ public class GatewayDeviceApp
 	public void stopApp(int code)
 	{
 		_Logger.info("Stopping GDA...");
+		sysPerfManager.stopManager();
 		
 		try {
 			// TODO: Your code here

@@ -36,7 +36,7 @@ public class SystemCpuUtilTask extends BaseSystemUtilTask
 	@Override
 	public float getTelemetryValue()
 	{
-		return 0.0f;
+		return (float) ManagementFactory.getOperatingSystemMXBean().getSystemLoadAverage();
 	}
 	
 }
