@@ -12,6 +12,7 @@ import static org.junit.Assert.*;
 
 import java.util.logging.Logger;
 
+import org.eclipse.paho.client.mqttv3.MqttException;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -80,8 +81,7 @@ public class DeviceDataManagerNoCommsTest
 	 * Test method for running the DeviceDataManager.
 	 */
 	@Test
-	public void testStartAndStopManagerNoComms()
-	{
+	public void testStartAndStopManagerNoComms() throws MqttException {
 		DeviceDataManager devDataMgr = new DeviceDataManager();
 		
 		devDataMgr.startManager();

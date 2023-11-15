@@ -11,6 +11,9 @@ package programmingtheiot.gda.app;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.eclipse.paho.client.mqttv3.MqttClient;
+import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
+import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 import programmingtheiot.common.ConfigConst;
 import programmingtheiot.common.ConfigUtil;
 import programmingtheiot.common.IActuatorDataListener;
@@ -31,6 +34,7 @@ import programmingtheiot.gda.connection.IRequestResponseClient;
 import programmingtheiot.gda.connection.MqttClientConnector;
 import programmingtheiot.gda.connection.RedisPersistenceAdapter;
 import programmingtheiot.gda.connection.SmtpClientConnector;
+import programmingtheiot.gda.system.SystemPerformanceManager;
 
 /**
  * Shell representation of class for student implementation.
@@ -38,25 +42,41 @@ import programmingtheiot.gda.connection.SmtpClientConnector;
  */
 public class DeviceDataManager implements IDataMessageListener
 {
+	private IActuatorDataListener actuatorDataListener = null;
+
+	// private MqttClientConnector mqttClient = null;
+	private MqttConnectOptions connOpts = null;
+	private MemoryPersistence persistence = null;
+	private IDataMessageListener dataMsgListener = null;
+
+	private String  clientID = null;
+	private String  brokerAddr = null;
+	private String  host = ConfigConst.DEFAULT_HOST;
+	private String  protocol = ConfigConst.DEFAULT_MQTT_PROTOCOL;
+	private int     port = ConfigConst.DEFAULT_MQTT_PORT;
+	private int     brokerKeepAlive = ConfigConst.DEFAULT_KEEP_ALIVE;
+
 	// static
 	
 	private static final Logger _Logger =
 		Logger.getLogger(DeviceDataManager.class.getName());
 	
 	// private var's
-	
+
 	private boolean enableMqttClient = true;
 	private boolean enableCoapServer = false;
 	private boolean enableCloudClient = false;
-	private boolean enableSmtpClient = false;
 	private boolean enablePersistenceClient = false;
 	private boolean enableSystemPerf = false;
+<<<<<<< HEAD
+
+=======
 	
 	private IActuatorDataListener actuatorDataListener = null;
+>>>>>>> 68661f8a28e6315c858fabc160a417e82ec7d241
 	private IPubSubClient mqttClient = null;
 	private IPubSubClient cloudClient = null;
 	private IPersistenceClient persistenceClient = null;
-	private IRequestResponseClient smtpClient = null;
 	private CoapServerGateway coapServer = null;
 	private SystemPerformanceManager sysPerfMgr = null;
 	
@@ -85,6 +105,8 @@ public class DeviceDataManager implements IDataMessageListener
 						ConfigConst.GATEWAY_DEVICE, ConfigConst.ENABLE_PERSISTENCE_CLIENT_KEY);
 
 		initManager();
+<<<<<<< HEAD
+=======
 	}
 	
 	public DeviceDataManager(
@@ -97,6 +119,7 @@ public class DeviceDataManager implements IDataMessageListener
 		super();
 		
 		initConnections();
+>>>>>>> 68661f8a28e6315c858fabc160a417e82ec7d241
 	}
 	
 	
@@ -164,11 +187,18 @@ public class DeviceDataManager implements IDataMessageListener
 			return false;
 		}
 	}
-	
+
 	public void setActuatorDataListener(String name, IActuatorDataListener listener)
 	{
+		if (listener != null) {
+			// for now, just ignore 'name' - if you need more than one listener,
+			// you can use 'name' to create a map of listener instances
+			this.actuatorDataListener = listener;
+		}
 	}
 
+<<<<<<< HEAD
+=======
 	private void initManager()
 	{
 		ConfigUtil configUtil = ConfigUtil.getInstance();
@@ -198,11 +228,44 @@ public class DeviceDataManager implements IDataMessageListener
 		}
 	}
 
+>>>>>>> 68661f8a28e6315c858fabc160a417e82ec7d241
 	public void startManager()
 	{
 		if (this.sysPerfMgr != null) {
 			this.sysPerfMgr.startManager();
 		}
+<<<<<<< HEAD
+
+		if (this.mqttClient != null) {
+			if (this.mqttClient.connectClient()) {
+				_Logger.info("Successfully connected MQTT client to broker.");
+
+				// add necessary subscriptions
+
+				// TODO: read this from the configuration file
+				int qos = ConfigConst.DEFAULT_QOS;
+
+				// TODO: check the return value for each and take appropriate action
+				this.mqttClient.subscribeToTopic(ResourceNameEnum.GDA_MGMT_STATUS_MSG_RESOURCE, qos);
+				this.mqttClient.subscribeToTopic(ResourceNameEnum.CDA_ACTUATOR_RESPONSE_RESOURCE, qos);
+				this.mqttClient.subscribeToTopic(ResourceNameEnum.CDA_SENSOR_MSG_RESOURCE, qos);
+				this.mqttClient.subscribeToTopic(ResourceNameEnum.CDA_SYSTEM_PERF_MSG_RESOURCE, qos);
+			} else {
+				_Logger.severe("Failed to connect MQTT client to broker.");
+
+				// TODO: take appropriate action
+			}
+		}
+
+		if (this.enableCoapServer && this.coapServer != null) {
+			if (this.coapServer.startServer()) {
+				_Logger.info("CoAP server started.");
+			} else {
+				_Logger.severe("Failed to start CoAP server. Check log file for details.");
+			}
+		}
+=======
+>>>>>>> 68661f8a28e6315c858fabc160a417e82ec7d241
 	}
 
 	public void stopManager()
@@ -210,6 +273,35 @@ public class DeviceDataManager implements IDataMessageListener
 		if (this.sysPerfMgr != null) {
 			this.sysPerfMgr.stopManager();
 		}
+<<<<<<< HEAD
+
+		if (this.mqttClient != null) {
+			// add necessary un-subscribes
+
+			// TODO: check the return value for each and take appropriate action
+			this.mqttClient.unsubscribeFromTopic(ResourceNameEnum.GDA_MGMT_STATUS_MSG_RESOURCE);
+			this.mqttClient.unsubscribeFromTopic(ResourceNameEnum.CDA_ACTUATOR_RESPONSE_RESOURCE);
+			this.mqttClient.unsubscribeFromTopic(ResourceNameEnum.CDA_SENSOR_MSG_RESOURCE);
+			this.mqttClient.unsubscribeFromTopic(ResourceNameEnum.CDA_SYSTEM_PERF_MSG_RESOURCE);
+
+			if (this.mqttClient.disconnectClient()) {
+				_Logger.info("Successfully disconnected MQTT client from broker.");
+			} else {
+				_Logger.severe("Failed to disconnect MQTT client from broker.");
+
+				// TODO: take appropriate action
+			}
+		}
+
+		if (this.enableCoapServer && this.coapServer != null) {
+			if (this.coapServer.stopServer()) {
+				_Logger.info("CoAP server stopped.");
+			} else {
+				_Logger.severe("Failed to stop CoAP server. Check log file for details.");
+			}
+		}
+=======
+>>>>>>> 68661f8a28e6315c858fabc160a417e82ec7d241
 	}
 
 	// private methods
@@ -221,6 +313,39 @@ public class DeviceDataManager implements IDataMessageListener
 	 */
 	private void initConnections()
 	{
+	}
+
+	private void initManager()
+	{
+		ConfigUtil configUtil = ConfigUtil.getInstance();
+
+		this.enableSystemPerf =
+				configUtil.getBoolean(ConfigConst.GATEWAY_DEVICE,  ConfigConst.ENABLE_SYSTEM_PERF_KEY);
+
+		if (this.enableSystemPerf) {
+			this.sysPerfMgr = new SystemPerformanceManager();
+			this.sysPerfMgr.setDataMessageListener(this);
+		}
+
+		// NOTE: This is new - creating the MQTT client connector instance
+		if (this.enableMqttClient) {
+			this.mqttClient = new MqttClientConnector();
+
+			// NOTE: The next line isn't technically needed until Lab Module 10
+			this.mqttClient.setDataMessageListener(this);
+		}
+
+		if (this.enableCoapServer) {
+			this.coapServer = new CoapServerGateway(this);
+		}
+
+		if (this.enableCloudClient) {
+			// TODO: implement this in Lab Module 10
+		}
+
+		if (this.enablePersistenceClient) {
+			// TODO: implement this as an optional exercise in Lab Module 5
+		}
 	}
 	
 }

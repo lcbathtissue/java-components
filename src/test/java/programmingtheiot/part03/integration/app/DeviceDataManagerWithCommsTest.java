@@ -10,6 +10,7 @@ package programmingtheiot.part03.integration.app;
 
 import java.util.logging.Logger;
 
+import org.eclipse.paho.client.mqttv3.MqttException;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -83,8 +84,7 @@ public class DeviceDataManagerWithCommsTest
 	 * Test method for running the DeviceDataManager.
 	 */
 	@Test
-	public void testStartAndStopManagerWithMqtt()
-	{
+	public void testStartAndStopManagerWithMqtt() throws MqttException {
 		DeviceDataManager devDataMgr = new DeviceDataManager();
 		devDataMgr.startManager();
 		

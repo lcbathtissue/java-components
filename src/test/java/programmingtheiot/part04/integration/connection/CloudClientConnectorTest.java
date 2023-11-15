@@ -14,6 +14,7 @@ import static org.junit.Assert.*;
 import java.util.List;
 import java.util.logging.Logger;
 
+import org.eclipse.paho.client.mqttv3.MqttException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -96,8 +97,7 @@ public class CloudClientConnectorTest
 	 * Test method
 	 */
 	@Test
-	public void testIntegratedCloudClientConnectAndDisconnect()
-	{
+	public void testIntegratedCloudClientConnectAndDisconnect() throws MqttException {
 		DeviceDataManager ddm = new DeviceDataManager();
 		ddm.startManager();
 		
